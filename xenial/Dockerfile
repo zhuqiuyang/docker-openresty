@@ -78,6 +78,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
         perl \
         unzip \
         zlib1g-dev \
+        git \
     && cd /tmp \
     && curl -fSL https://www.openssl.org/source/openssl-${RESTY_OPENSSL_VERSION}.tar.gz -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && tar xzf openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
@@ -85,7 +86,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && tar xzf pcre-${RESTY_PCRE_VERSION}.tar.gz \
     && curl -fSL https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz -o openresty-${RESTY_VERSION}.tar.gz \
     && tar xzf openresty-${RESTY_VERSION}.tar.gz \
+    && git clone https://github.com/yzprofile/ngx_http_dyups_module \
+    && git clone https://github.com/yaoweibin/nginx_upstream_check_module \
     && cd /tmp/openresty-${RESTY_VERSION} \
+    && cd bundle/nginx-1.13.6 \
+    && patch -p1 < /tmp/nginx_upstream_check_module/check_1.12.1+.patch \
+    && cd - \
     && ./configure -j${RESTY_J} ${_RESTY_CONFIG_DEPS} ${RESTY_CONFIG_OPTIONS} ${RESTY_CONFIG_OPTIONS_MORE} \
     && make -j${RESTY_J} \
     && make -j${RESTY_J} install \
